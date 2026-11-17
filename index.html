@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#101411" />
+  <title>FINCORE</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <style>
+    :root{color-scheme:dark;--bg:#101411;--panel:#1a241e;--panel2:#202c24;--green:#4ade80;--muted:#9aaa9f;--red:#fb7185}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f5f7f5;font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+    .wrap{max-width:720px;margin:auto;padding:18px 15px 40px}.top{display:flex;justify-content:space-between;align-items:center;margin:4px 0 18px}
+    h1{font-size:25px;letter-spacing:1.5px;margin:0}.sub,.muted{color:var(--muted);font-size:12px}
+    .tag{border:1px solid #31583d;color:var(--green);border-radius:20px;padding:5px 10px;font-size:11px}
+    nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+    button,.tab{border:0;border-radius:11px;padding:12px;background:var(--panel2);color:#e9f0eb;font-weight:650;font-size:14px}
+    button.active,.primary{background:var(--green);color:#092012}.panel{background:var(--panel);border:1px solid #29382e;border-radius:17px;padding:16px;margin:12px 0}
+    .balance{font-size:30px;font-weight:800;margin:6px 0;color:var(--green);overflow-wrap:anywhere}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:var(--panel);border-radius:14px;padding:14px;min-width:0}
+    .metric strong{display:block;font-size:18px;margin-top:6px;overflow-wrap:anywhere}.green{color:var(--green)}.red{color:var(--red)}
+    label{display:block;color:var(--muted);font-size:12px;margin:13px 0 6px}
+    input,select{width:100%;padding:13px;border:1px solid #34443a;border-radius:10px;background:#111a14;color:white;font-size:16px}
+    .row{display:flex;gap:8px}.row>*{flex:1}.primary{width:100%;margin-top:15px;padding:14px}
+    .item{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #2b382f}.item:last-child{border:0}
+    .item small{display:block;color:var(--muted);margin-top:3px}.amount{white-space:nowrap;font-weight:700}
+    .hidden{display:none!important}.bar{height:9px;background:#344239;border-radius:20px;overflow:hidden;margin-top:8px}.bar>div{height:100%;background:var(--green);width:0}
+    .note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:18px}.danger{background:#3a2026;color:#ffc5ce;width:100%;margin-top:12px}
+    @media(min-width:600px){.wrap{padding-top:28px}.balance{font-size:36px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><div><h1>FINCORE</h1><div class="sub">SEU CONTROLE FINANCEIRO</div></div><span class="tag">PESSOAL · V1.0</span></header>
+  <nav>
+    <button class="tab active" data-tab="dashboard">Painel</button>
+    <button class="tab" data-tab="add">Lançar</button>
+    <button class="tab" data-tab="history">Histórico</button>
+  </nav>
+
+  <section id="dashboard">
+    <div class="panel"><div class="muted">SALDO DO PERÍODO REGISTRADO</div><div id="balance" class="balance">R$ 0,00</div><div class="muted">Entradas menos saídas registradas</div></div>
+    <div class="grid">
+      <div class="metric"><span class="muted">Receitas</span><strong id="income" class="green">R$ 0,00</strong></div>
+      <div class="metric"><span class="muted">Despesas</span><strong id="expenses" class="red">R$ 0,00</strong></div>
+      <div class="metric"><span class="muted">Corridas</span><strong id="rides">0</strong></div>
+      <div class="metric"><span class="muted">Saldo de lançamentos</span><strong id="net">R$ 0,00</strong></div>
+    </div>
+    <div class="panel">
+      <div><b>Meta de faturamento diário</b></div>
+      <label for="goal">Meta em reais</label><input id="goal" type="number" min="0" step="0.01" value="200">
+      <div class="row" style="align-items:center;margin-top:9px"><div class="bar"><div id="progress"></div></div><b id="percent" class="green">0%</b></div>
+      <div class="muted" id="remaining" style="margin-top:7px">Faltam R$ 200,00 para a meta</div>
+    </div>
+    <div class="panel"><b>Resumo por categoria</b><div id="categories" class="muted" style="margin-top:10px">Sem lançamentos ainda.</div></div>
+    <div class="panel"><b>Últimos lançamentos</b><div id="recent" class="muted" style="margin-top:8px">Nenhum lançamento registrado.</div></div>
+  </section>
+
+  <section id="add" class="hidden">
+    <div class="panel">
+      <b>Novo lançamento</b>
+      <label for="type">Tipo</label><select id="type"><option value="income">Entrada</option><option value="expense">Despesa</option></select>
+      <label for="value">Valor (R$)</label><input id="value" type="number" min="0.01" step="0.01" placeholder="Ex.: 25,00" inputmode="decimal">
+      <label for="category">Categoria</label><select id="category"></select>
+      <label for="description">Descrição</label><input id="description" maxlength="80" placeholder="Ex.: corrida iFood">
+      <label for="date">Data</label><input id="date" type="date">
+      <button id="save" class="primary">Salvar lançamento</button>
+    </div>
+    <div class="panel muted">Dica: registre cada corrida como entrada. Combustível, alimentação, aluguel da moto e manutenção entram como despesas.</div>
+  </section>
+
+  <section id="history" class="hidden">
+    <div class="panel"><b>Todos os lançamentos</b><div id="all" style="margin-top:8px" class="muted">Nenhum lançamento registrado.</div><button id="export" class="primary">Exportar backup (CSV)</button><button id="clear" class="danger">Apagar todos os dados</button></div>
+  </section>
+  <div class="note">FINCORE V1.0 · Os dados ficam armazenados neste aparelho. Faça backups periódicos pelo botão Exportar. Esta versão não sincroniza automaticamente entre aparelhos.</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const key='fincore_entries_v1';
+let entries=[];try{entries=JSON.parse(localStorage.getItem(key)||'[]')}catch(e){entries=[]}
+const categories={income:['Corridas','Outros ganhos','Outras receitas'],expense:['Combustível','Alimentação','Aluguel da moto','Manutenção / óleo','Contas da casa','Dívidas','Compras pessoais','Saúde','Lazer','Investimentos / reserva','Outros gastos']};
+function persist(){localStorage.setItem(key,JSON.stringify(entries));render()}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function options(){const list=categories[$('type').value];$('category').innerHTML=list.map(c=>`<option>${c}</option>`).join('')}
+$('type').addEventListener('change',options);options();
+$('date').value=new Date().toISOString().slice(0,10);
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));['dashboard','add','history'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));render()}));
+$('save').addEventListener('click',()=>{const amount=Number($('value').value);if(!Number.isFinite(amount)||amount<=0){alert('Informe um valor maior que zero.');return}
+entries.push({id:Date.now(),type:$('type').value,amount,category:$('category').value,description:$('description').value.trim(),date:$('date').value||new Date().toISOString().slice(0,10)});
+$('value').value='';$('description').value='';persist();document.querySelector('[data-tab="dashboard"]').click()});
+$('goal').addEventListener('input',render);
+function row(e){return `<div class="item"><div>${esc(e.description||e.category)}<small>${esc(e.category)} · ${e.date.split('-').reverse().join('/')}</small></div><div class="amount ${e.type==='income'?'green':'red'}">${e.type==='income'?'+':'−'}${fmt(e.amount)}</div></div>`}
+function render(){
+const inc=entries.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0),out=entries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0),rides=entries.filter(e=>e.type==='income'&&e.category==='Corridas').length,net=inc-out;
+$('balance').textContent=fmt(net);$('balance').className='balance '+(net<0?'red':'green');$('income').textContent=fmt(inc);$('expenses').textContent=fmt(out);$('rides').textContent=rides;$('net').textContent=fmt(net);
+const goal=Math.max(0,Number($('goal').value)||0),pct=goal?Math.round(inc/goal*100):0;$('progress').style.width=Math.min(100,pct)+'%';$('percent').textContent=pct+'%';$('remaining').textContent=fmt(Math.max(0,goal-inc))+' para a meta (meta configurada)';
+$('recent').innerHTML=entries.length?entries.slice(-5).reverse().map(row).join(''):'Nenhum lançamento registrado.';
+$('all').innerHTML=entries.length?[...entries].reverse().map(row).join(''):'Nenhum lançamento registrado.';
+const sums={};entries.filter(e=>e.type==='expense').forEach(e=>sums[e.category]=(sums[e.category]||0)+e.amount);
+$('categories').innerHTML=Object.keys(sums).length?Object.entries(sums).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`<div class="item"><span>${esc(c)}</span><b>${fmt(v)}</b></div>`).join(''):'Sem despesas registradas.';
+}
+$('export').addEventListener('click',()=>{const lines=[['data','tipo','categoria','descricao','valor'],...entries.map(e=>[e.date,e.type,e.category,e.description,e.amount])];const csv='\uFEFF'+lines.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='fincore-backup.csv';a.click();URL.revokeObjectURL(a.href)});
+$('clear').addEventListener('click',()=>{if(confirm('Tem certeza? Isso apagará todos os lançamentos salvos neste aparelho. Exporte um backup antes.')){entries=[];persist()}});
+render();
+</script>
+</body></html>

@@ -1,0 +1,6 @@
+{
+  "appId": "com.fincore.pessoal",
+  "appName": "FINCORE",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
